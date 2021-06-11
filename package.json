@@ -1,0 +1,38 @@
+{
+  "name": "canvaskit-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development TS_NODE_PROJECT=webpack/tsconfig.json webpack serve --config webpack/webpack.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource/inter": "^4.4.5",
+    "@fontsource/noto-sans": "^4.4.5",
+    "@fontsource/noto-sans-jp": "^4.4.5",
+    "canvaskit-wasm": "^0.27.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/copy-webpack-plugin": "^8.0.0",
+    "@types/lodash": "^4.14.170",
+    "@types/node": "^15.12.2",
+    "@types/webpack": "^5.28.0",
+    "@types/webpack-dev-server": "^3.11.4",
+    "copy-webpack-plugin": "^9.0.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^5.2.6",
+    "html-webpack-plugin": "^5.3.1",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^9.2.3",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
+  }
+}

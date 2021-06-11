@@ -1,0 +1,5 @@
+canvas#editor {
+  box-sizing: border-box;
+  cursor: text;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
