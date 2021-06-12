@@ -108,15 +108,18 @@ async function render(kit: CanvasKit) {
   paintForCursor.setColor(kit.Color(182, 44, 49, 1.0));
   paintForCursor.setAntiAlias(true);
 
+  const paintForCaret = new kit.Paint();
+  paintForCaret.setColor(kit.Color(0, 0, 0, 0.8));
+  paintForCaret.setStrokeWidth(1.5);
+  paintForCaret.setAntiAlias(true);
+
   let selection: [number, number] | null = [2, 100];
   let selectedRects: Float32Array[] | null = paragraph.getRectsForRange(
     ...selection,
     kit.RectHeightStyle.Max,
     kit.RectWidthStyle.Tight
   ) as unknown as Float32Array[];
-
-  let caret = 0;
-  let caretRect = 0;
+  let caretPosition: [x: number, top: number, bottom: number] | null = null;
 
   function resetSelection(x: number, y: number): void {
     const { pos } = paragraph.getGlyphPositionAtCoordinate(x, y);
@@ -142,16 +145,45 @@ async function render(kit: CanvasKit) {
   function updateSelectionRects(): void {
     if (selection) {
       let [low, high] = selection;
-      if (low > high) {
-        [high, low] = selection;
+      if (low === high) {
+        selectedRects = null;
+        // Special case: caret in the beginning.
+        if (low === 0) {
+          high = 1;
+        }
+        // Special case: caret in the end.
+        else if (low + 1 === text.length) {
+          low = high - 1;
+        }
+        // Normal case.
+        else {
+          high = low + 1;
+        }
+        const rects = paragraph.getRectsForRange(
+          low,
+          high,
+          kit.RectHeightStyle.Max,
+          kit.RectWidthStyle.Tight
+        ) as unknown as Float32Array[];
+        // It should be greater than 0.
+        if (rects.length > 0) {
+          const [[x0, y0, , y1]] = rects;
+          selectedRects = null;
+          caretPosition = [x0, y0, y1];
+        }
+      } else {
+        if (low > high) {
+          [high, low] = selection;
+        }
+        console.log(`Selection range: ${low}, ${high}`);
+        selectedRects = paragraph.getRectsForRange(
+          low,
+          high,
+          kit.RectHeightStyle.Max,
+          kit.RectWidthStyle.Tight
+        ) as unknown as Float32Array[];
+        caretPosition = null;
       }
-      console.log(`Selection range: ${low}, ${high}`);
-      selectedRects = paragraph.getRectsForRange(
-        low,
-        high,
-        kit.RectHeightStyle.Max,
-        kit.RectWidthStyle.Tight
-      ) as unknown as Float32Array[];
     } else {
       selectedRects = null;
     }
@@ -180,6 +212,11 @@ async function render(kit: CanvasKit) {
     }
     // Draw the paragraph.
     canvas.drawParagraph(paragraph, 0, 0);
+    // Draw the caret.
+    if (caretPosition !== null) {
+      const [x, top, bottom] = caretPosition;
+      canvas.drawLine(x, top, x, bottom, paintForCaret);
+    }
     // Indicate the cursor position.
     if (lastMousePosition && controls.showCursorPosition) {
       canvas.drawCircle(...lastMousePosition, 4, paintForCursor);
