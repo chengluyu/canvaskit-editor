@@ -86,12 +86,14 @@ async function render(kit: CanvasKit) {
   });
 
   canvasEl.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && selection) {
+    if ((e.key === "Backspace" || e.key === "Delete") && selection) {
       const begin = Math.min(...selection);
       const end = Math.max(...selection);
       setText(text.slice(0, begin) + text.slice(end));
-      clearSelection();
+      selection = [begin, begin];
+      updateSelectionRects();
     }
+
   });
 
   const paintForSelection = new kit.Paint();
@@ -145,7 +147,6 @@ async function render(kit: CanvasKit) {
   function updateSelectionRects(): void {
     if (selection) {
       let [low, high] = selection;
-      console.log(`Selection range: ${low}, ${high}`);
       if (low === high) {
         let useX1 = false;
         selectedRects = null;
