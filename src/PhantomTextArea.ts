@@ -6,7 +6,7 @@ export type PhantomTextAreaEventMap = {
   delete: { type: "delete" };
 };
 
-export class PhantomTextArea extends EventTarget<PhantomTextAreaEventMap> {
+export default class PhantomTextArea extends EventTarget<PhantomTextAreaEventMap> {
   private _element = document.createElement("textarea");
   private _container = document.querySelector(".canvaskit-editor");
   private _isCompositionStarted = false;
