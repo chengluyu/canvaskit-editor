@@ -27,6 +27,43 @@ export default class TextModel {
     this._setText(newText);
   }
 
+  public getWordIncludingPosition(position: number): [number, number] | null {
+    this._clampByRange(position);
+    const codePoint = this._text.codePointAt(position);
+    if (codePoint === undefined) {
+      return null;
+    }
+    const category = categorizeCodePoint(codePoint);
+    // Note: `first` is an inclusive index.
+    let first = position;
+    while (first - 1 >= 0) {
+      const codePoint = this._text.codePointAt(first - 1);
+      if (
+        codePoint === undefined ||
+        category !== categorizeCodePoint(codePoint)
+      ) {
+        break;
+      }
+      first -= 1;
+    }
+    // Note: `last` is an inclusive index.
+    let last = position;
+    while (last + 1 < this._text.length) {
+      const codePoint = this._text.codePointAt(last + 1);
+      if (
+        codePoint === undefined ||
+        category !== categorizeCodePoint(codePoint)
+      ) {
+        break;
+      }
+      last += 1;
+    }
+    // [first, last] -> [begin, end)
+    return position - first < last - position
+      ? [first, last + 1]
+      : [last + 1, first];
+  }
+
   public deleteBackward(position: number): number {
     position = this._clampByRange(position);
     this.strip(position - 1, position);
@@ -72,4 +109,27 @@ export default class TextModel {
 
 function sortedCouple(a: number, b: number): [number, number] {
   return a > b ? [b, a] : [a, b];
+}
+
+enum CharacterCategory {
+  Alphabet,
+  Numeric,
+  Others,
+  NonAscii,
+}
+
+function categorizeCodePoint(codePoint: number): CharacterCategory {
+  if (codePoint <= 255) {
+    if (
+      (97 <= codePoint && codePoint <= 122) ||
+      (65 <= codePoint && codePoint <= 90)
+    ) {
+      return CharacterCategory.Alphabet;
+    }
+    if (48 <= codePoint && codePoint <= 57) {
+      return CharacterCategory.Numeric;
+    }
+    return CharacterCategory.Others;
+  }
+  return CharacterCategory.NonAscii;
 }

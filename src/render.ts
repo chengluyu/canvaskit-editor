@@ -75,6 +75,15 @@ export async function render(kit: CanvasKit) {
     resetSelection(...lastMousePosition);
   });
 
+  canvasEl.addEventListener("dblclick", (e) => {
+    lastMousePosition = [e.offsetX, e.offsetY];
+    const { pos } = paragraph.getGlyphPositionAtCoordinate(
+      ...lastMousePosition
+    );
+    selection = model.getWordIncludingPosition(pos);
+    updateSelectionRects();
+  });
+
   canvasEl.addEventListener("mouseup", (e) => {
     lastMousePosition = [e.offsetX, e.offsetY];
     isMouseDown = false;
