@@ -145,15 +145,18 @@ async function render(kit: CanvasKit) {
   function updateSelectionRects(): void {
     if (selection) {
       let [low, high] = selection;
+      console.log(`Selection range: ${low}, ${high}`);
       if (low === high) {
+        let useX1 = false;
         selectedRects = null;
         // Special case: caret in the beginning.
         if (low === 0) {
           high = 1;
         }
         // Special case: caret in the end.
-        else if (low + 1 === text.length) {
+        else if (low === text.length) {
           low = high - 1;
+          useX1 = true;
         }
         // Normal case.
         else {
@@ -167,15 +170,14 @@ async function render(kit: CanvasKit) {
         ) as unknown as Float32Array[];
         // It should be greater than 0.
         if (rects.length > 0) {
-          const [[x0, y0, , y1]] = rects;
+          const [[x0, y0, x1, y1]] = rects;
           selectedRects = null;
-          caretPosition = [x0, y0, y1];
+          caretPosition = [useX1 ? x1 : x0, y0, y1];
         }
       } else {
         if (low > high) {
           [high, low] = selection;
         }
-        console.log(`Selection range: ${low}, ${high}`);
         selectedRects = paragraph.getRectsForRange(
           low,
           high,
