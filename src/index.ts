@@ -4,8 +4,8 @@ import { CanvasKitInit, Paint, Paragraph, ShapedLine } from "./canvaskit";
 import { createCanvasElement } from "./helpers";
 import { sampleText } from "./data";
 import { loadFonts } from "./fonts";
-import clamp from "lodash/clamp";
 import * as controls from "./controls";
+import TextModel from "./text";
 
 CanvasKitInit().then(render);
 
@@ -30,26 +30,21 @@ async function render(kit: CanvasKit) {
     textAlign: kit.TextAlign.Left,
   });
 
-  let text = sampleText;
+  let model = new TextModel(sampleText);
   let paragraph = buildParagraph();
   let shapedLines = paragraph.getShapedLines();
 
-  function setText(newText: string): void {
-    console.log(newText);
-    text = newText;
+  model.onChange(() => {
     paragraph = buildParagraph();
     shapedLines = paragraph.getShapedLines();
     if (selection !== null) {
-      let [low, high] = selection;
-      low = clamp(low, 0, text.length);
-      high = clamp(high, 0, text.length);
-      selection = [low, high];
+      selection = model.clampRange(selection);
     }
-  }
+  });
 
   function buildParagraph(): Paragraph {
     const builder = kit.ParagraphBuilder.Make(paragraphStyle, fontMgr);
-    builder.addText(text);
+    builder.addText(model.text);
     const paragraph = builder.build();
     paragraph.layout(width);
     return paragraph;
@@ -86,14 +81,36 @@ async function render(kit: CanvasKit) {
   });
 
   canvasEl.addEventListener("keydown", (e) => {
-    if ((e.key === "Backspace" || e.key === "Delete") && selection) {
-      const begin = Math.min(...selection);
-      const end = Math.max(...selection);
-      setText(text.slice(0, begin) + text.slice(end));
-      selection = [begin, begin];
-      updateSelectionRects();
+    switch (e.key) {
+      case "Backspace":
+        if (selection === null) {
+        } else {
+          const [begin, end] = selection;
+          if (begin === end) {
+            const position = model.deleteBackward(begin);
+            selection = [position, position];
+          } else {
+            const position = model.strip(begin, end);
+            selection = [position, position];
+          }
+          updateSelectionRects();
+        }
+        break;
+      case "Delete":
+        if (selection === null) {
+        } else {
+          const [begin, end] = selection;
+          if (begin === end) {
+            const position = model.deleteForward(begin);
+            selection = [position, position];
+          } else {
+            const position = model.strip(begin, end);
+            selection = [position, position];
+          }
+          updateSelectionRects();
+        }
+        break;
     }
-
   });
 
   const paintForSelection = new kit.Paint();
@@ -122,6 +139,8 @@ async function render(kit: CanvasKit) {
     kit.RectWidthStyle.Tight
   ) as unknown as Float32Array[];
   let caretPosition: [x: number, top: number, bottom: number] | null = null;
+
+  model.onChange(updateSelectionRects);
 
   function resetSelection(x: number, y: number): void {
     const { pos } = paragraph.getGlyphPositionAtCoordinate(x, y);
@@ -155,7 +174,7 @@ async function render(kit: CanvasKit) {
           high = 1;
         }
         // Special case: caret in the end.
-        else if (low === text.length) {
+        else if (low === model.text.length) {
           low = high - 1;
           useX1 = true;
         }
