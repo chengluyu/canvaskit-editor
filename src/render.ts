@@ -4,7 +4,7 @@ import { createCanvasElement } from "./helpers";
 import { sampleText } from "./data";
 import { loadFonts } from "./fonts";
 import * as controls from "./controls";
-import TextModel from "./text";
+import TextModel from "./TextModel";
 import PhantomTextArea from "./PhantomTextArea";
 import { drawShapedLines } from "./canvas-helpers";
 import { fontFamilies } from "../shared/fonts";
