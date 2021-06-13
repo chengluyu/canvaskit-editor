@@ -195,6 +195,7 @@ async function render(kit: CanvasKit) {
           caretPosition = [useX1 ? x1 : x0, y0, y1];
         }
       } else {
+        const useLast = low > high;
         if (low > high) {
           [high, low] = selection;
         }
@@ -204,7 +205,15 @@ async function render(kit: CanvasKit) {
           kit.RectHeightStyle.Max,
           kit.RectWidthStyle.Tight
         ) as unknown as Float32Array[];
-        caretPosition = null;
+        if (selectedRects.length > 0) {
+          const rect = useLast
+            ? selectedRects[selectedRects.length - 1]
+            : selectedRects[0];
+          const [x0, y0, x1, y1] = rect;
+          caretPosition = [useLast ? x1 : x0, y0, y1];
+        } else {
+          caretPosition = null;
+        }
       }
     } else {
       selectedRects = null;
