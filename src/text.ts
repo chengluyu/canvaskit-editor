@@ -48,6 +48,15 @@ export default class TextModel {
     return begin;
   }
 
+  public insert(position: number, text: string): number {
+    position = this._clampByRange(position);
+    this._setText(
+      this._text.slice(0, position) + text + this._text.slice(position)
+    );
+    console.log("Insert", text, position, text.length, position + text.length);
+    return position + text.length;
+  }
+
   public onChange(callback: () => void): void {
     this._onChanges.push(callback);
   }

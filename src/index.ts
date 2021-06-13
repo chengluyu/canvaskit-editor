@@ -6,6 +6,7 @@ import { sampleText } from "./data";
 import { loadFonts } from "./fonts";
 import * as controls from "./controls";
 import TextModel from "./text";
+import { PhantomTextArea } from "./PhantomTextArea";
 
 CanvasKitInit().then(render);
 
@@ -83,32 +84,10 @@ async function render(kit: CanvasKit) {
   canvasEl.addEventListener("keydown", (e) => {
     switch (e.key) {
       case "Backspace":
-        if (selection === null) {
-        } else {
-          const [begin, end] = selection;
-          if (begin === end) {
-            const position = model.deleteBackward(begin);
-            selection = [position, position];
-          } else {
-            const position = model.strip(begin, end);
-            selection = [position, position];
-          }
-          updateSelectionRects();
-        }
+        performBackspace();
         break;
       case "Delete":
-        if (selection === null) {
-        } else {
-          const [begin, end] = selection;
-          if (begin === end) {
-            const position = model.deleteForward(begin);
-            selection = [position, position];
-          } else {
-            const position = model.strip(begin, end);
-            selection = [position, position];
-          }
-          updateSelectionRects();
-        }
+        performDelete();
         break;
     }
   });
@@ -139,6 +118,20 @@ async function render(kit: CanvasKit) {
     kit.RectWidthStyle.Tight
   ) as unknown as Float32Array[];
   let caretPosition: [x: number, top: number, bottom: number] | null = null;
+  const textArea = new PhantomTextArea();
+
+  textArea.addEventListener("insert", (event) => {
+    if (selection) {
+      const [low, high] = selection;
+      if (low === high) {
+        const position = model.insert(low, event.text);
+        selection = [position, position];
+        updateSelectionRects();
+      }
+    }
+  });
+  textArea.addEventListener("backspace", performBackspace);
+  textArea.addEventListener("delete", performDelete);
 
   model.onChange(updateSelectionRects);
 
@@ -193,6 +186,10 @@ async function render(kit: CanvasKit) {
           const [[x0, y0, x1, y1]] = rects;
           selectedRects = null;
           caretPosition = [useX1 ? x1 : x0, y0, y1];
+          textArea.height = Math.abs(y1 - y0);
+          textArea.move(x0, y0);
+          textArea.show();
+          textArea.focus();
         }
       } else {
         const useLast = low > high;
@@ -211,12 +208,43 @@ async function render(kit: CanvasKit) {
             : selectedRects[0];
           const [x0, y0, x1, y1] = rect;
           caretPosition = [useLast ? x1 : x0, y0, y1];
+          textArea.height = Math.abs(y1 - y0);
         } else {
           caretPosition = null;
         }
       }
     } else {
       selectedRects = null;
+    }
+  }
+
+  function performBackspace(): void {
+    if (selection === null) {
+    } else {
+      const [begin, end] = selection;
+      if (begin === end) {
+        const position = model.deleteBackward(begin);
+        selection = [position, position];
+      } else {
+        const position = model.strip(begin, end);
+        selection = [position, position];
+      }
+      updateSelectionRects();
+    }
+  }
+
+  function performDelete(): void {
+    if (selection === null) {
+    } else {
+      const [begin, end] = selection;
+      if (begin === end) {
+        const position = model.deleteForward(begin);
+        selection = [position, position];
+      } else {
+        const position = model.strip(begin, end);
+        selection = [position, position];
+      }
+      updateSelectionRects();
     }
   }
 

@@ -4,6 +4,7 @@ specifiers:
   '@fontsource/inter': ^4.4.5
   '@fontsource/noto-sans': ^4.4.5
   '@fontsource/noto-sans-jp': ^4.4.5
+  '@fontsource/noto-sans-sc': ^4.4.5
   '@types/copy-webpack-plugin': ^8.0.0
   '@types/lodash': ^4.14.170
   '@types/node': ^15.12.2
@@ -27,6 +28,7 @@ dependencies:
   '@fontsource/inter': 4.4.5
   '@fontsource/noto-sans': 4.4.5
   '@fontsource/noto-sans-jp': 4.4.5
+  '@fontsource/noto-sans-sc': 4.4.5
   canvaskit-wasm: 0.27.0
   lodash: 4.17.21
 
@@ -61,6 +63,10 @@ packages:
 
   /@fontsource/noto-sans-jp/4.4.5:
     resolution: {integrity: sha512-yQB+WXHP3XLccKulWdHSxmzPE3oCHxa9vdQHoe7t28F08LGf3ADt9/zN44X0DQL5eWhvyoKcPGVvYb4y9gVAwQ==}
+    dev: false
+
+  /@fontsource/noto-sans-sc/4.4.5:
+    resolution: {integrity: sha512-8BEI3FSi/u2Xz5tET0kw5mBhq06l1+OMi864jfYmka7J2X/PRuiBC7Fmsmwqb3Do5iDTmHqD7oNDupzsractFA==}
     dev: false
 
   /@fontsource/noto-sans/4.4.5:

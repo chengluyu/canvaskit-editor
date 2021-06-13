@@ -11,7 +11,6 @@ export function createCanvasElement(
     document.body.appendChild(element);
   }
   element.id = "editor";
-  element.tabIndex = 0;
   [element.width, element.height] = [width * scale, height * scale];
   element.style.width = `${width}px`;
   element.style.height = `${height}px`;

@@ -14,6 +14,7 @@
     "@fontsource/inter": "^4.4.5",
     "@fontsource/noto-sans": "^4.4.5",
     "@fontsource/noto-sans-jp": "^4.4.5",
+    "@fontsource/noto-sans-sc": "^4.4.5",
     "canvaskit-wasm": "^0.27.0",
     "lodash": "^4.17.21"
   },

@@ -1,5 +1,30 @@
+.canvaskit-editor {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
 canvas#editor {
+  position: absolute;
+  top: 0;
+  left: 0;
   box-sizing: border-box;
   cursor: text;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+textarea.phantom {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  outline: none !important;
+  resize: none;
+  border: none;
+  overflow: hidden;
+  color: transparent;
+  background-color: transparent;
 }

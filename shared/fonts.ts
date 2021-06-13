@@ -29,6 +29,12 @@ export const fonts: FontDescription[] = [
     fontName: "Noto Sans Hebrew",
   },
   {
+    filePath:
+      "node_modules/@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-400-normal.woff2",
+    runtimeFileName: "noto-sans-sc-regular.woff2",
+    fontName: "Noto Sans SC",
+  },
+  {
     filePath: "vendors/noto-emoji/fonts/NotoColorEmoji.ttf",
     runtimeFileName: "noto-color-emoji.ttf",
     fontName: "Noto Color Emoji",
