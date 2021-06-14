@@ -16,6 +16,7 @@ specifiers:
   css-loader: ^5.2.6
   html-webpack-plugin: ^5.3.1
   lodash: ^4.17.21
+  normalize.css: ^8.0.1
   style-loader: ^2.0.0
   ts-loader: ^9.2.3
   ts-node: ^10.0.0
@@ -32,6 +33,7 @@ dependencies:
   '@fontsource/noto-sans-sc': 4.4.5
   canvaskit-wasm: 0.27.0
   lodash: 4.17.21
+  normalize.css: 8.0.1
 
 devDependencies:
   '@types/copy-webpack-plugin': 8.0.0_webpack-cli@4.7.2
@@ -2493,6 +2495,10 @@ packages:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /normalize.css/8.0.1:
+    resolution: {integrity: sha512-qizSNPO93t1YUuUhP22btGOo3chcvDFqFaj2TRybP0DMxkHOCTYwp3n34fel4a31ORXy4m1Xq0Gyqpb5m33qIg==}
+    dev: false
 
   /npm-run-path/2.0.2:
     resolution: {integrity: sha1-NakjLfo11wZ7TLLd8jV7GHFTbF8=}

@@ -8,6 +8,11 @@
   </head>
   <body>
     <h1>Text Editor with CanvasKit</h1>
+    <div>
+      <a href="https://github.com/chengluyu/canvaskit-editor" target="_blank">
+        GitHub
+      </a>
+    </div>
     <div class="canvaskit-editor">
       <canvas id="editor" tabindex="0"></canvas>
     </div>
@@ -19,5 +24,23 @@
       <input id="show-cursor-position" type="checkbox" />
       <label for="show-cursor-position">Show cursor position</label>
     </div>
+    <hr />
+    <p>Supported features:</p>
+    <ul>
+      <li>Display the caret. Note: the caret does not blink for now.</li>
+      <li>
+        Accept inputs from keys and input methods. Note: composition text does
+        not show for now.
+      </li>
+      <li>Select a range of text by mouse.</li>
+      <li>
+        Delete characters with <kbd>Delete</kbd> and <kbd>Backspace</kbd>.
+      </li>
+      <li>
+        Delete selected text with <kbd>Delete</kbd> and <kbd>Backspace</kbd>.
+      </li>
+      <li>Move the caret with arrow keys.</li>
+      <li>Double click to select words.</li>
+    </ul>
   </body>
 </html>
