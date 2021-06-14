@@ -14,6 +14,7 @@ export async function render(kit: CanvasKit) {
   const scale = window.devicePixelRatio;
   const canvasEl = createCanvasElement(width, height, scale);
   const surface = kit.MakeCanvasSurface(canvasEl);
+  const fontSize = 24;
   if (surface === null) {
     throw new Error("cannot make the canvas surface");
   }
@@ -25,7 +26,7 @@ export async function render(kit: CanvasKit) {
     textStyle: {
       color: kit.BLACK,
       fontFamilies,
-      fontSize: 24,
+      fontSize,
     },
     textAlign: kit.TextAlign.Left,
   });
@@ -97,6 +98,18 @@ export async function render(kit: CanvasKit) {
       case "Delete":
         performDelete();
         break;
+      case "ArrowUp":
+        performMoveBetweenRows(true);
+        break;
+      case "ArrowDown":
+        performMoveBetweenRows(false);
+        break;
+      case "ArrowLeft":
+        performMoveLeft();
+        break;
+      case "ArrowRight":
+        performMoveRight();
+        break;
     }
   });
 
@@ -140,6 +153,10 @@ export async function render(kit: CanvasKit) {
   });
   textArea.addEventListener("backspace", performBackspace);
   textArea.addEventListener("delete", performDelete);
+  textArea.addEventListener("left", performMoveLeft);
+  textArea.addEventListener("right", performMoveRight);
+  textArea.addEventListener("up", performMoveBetweenRows.bind(null, true));
+  textArea.addEventListener("down", performMoveBetweenRows.bind(null, false));
 
   model.onChange(updateSelectionRects);
 
@@ -256,6 +273,41 @@ export async function render(kit: CanvasKit) {
       }
       updateSelectionRects();
     }
+  }
+
+  function performMoveLeft() {
+    if (selection === null) {
+      return;
+    }
+    const position = model.clampPosition(Math.min(...selection) - 1);
+    selection = [position, position];
+    updateSelectionRects();
+  }
+
+  function performMoveRight() {
+    if (selection === null) {
+      return;
+    }
+    const position = model.clampPosition(Math.min(...selection) + 1);
+    selection = [position, position];
+    updateSelectionRects();
+  }
+
+  function performMoveBetweenRows(upward: boolean): void {
+    if (caretPosition === null) {
+      return;
+    }
+    const [x, y0, y1] = caretPosition;
+    const y = (upward ? Math.min : Math.max)(y0, y1);
+    const glyphPosition = paragraph.getGlyphPositionAtCoordinate(
+      x,
+      upward
+        ? Math.max(0, y - fontSize / 2)
+        : Math.min(height, y + fontSize / 2)
+    );
+    // Update the selection.
+    selection = [glyphPosition.pos, glyphPosition.pos];
+    updateSelectionRects();
   }
 
   // Start the rendering looop.

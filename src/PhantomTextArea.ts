@@ -4,6 +4,10 @@ export type PhantomTextAreaEventMap = {
   insert: { type: "insert"; text: string };
   backspace: { type: "backspace" };
   delete: { type: "delete" };
+  up: { type: "up" };
+  down: { type: "down" };
+  left: { type: "left" };
+  right: { type: "right" };
 };
 
 export default class PhantomTextArea extends EventTarget<PhantomTextAreaEventMap> {
@@ -59,6 +63,18 @@ export default class PhantomTextArea extends EventTarget<PhantomTextAreaEventMap
           break;
         case "Delete":
           this.dispatchEvent({ type: "delete" });
+          break;
+        case "ArrowUp":
+          this.dispatchEvent({ type: "up" });
+          break;
+        case "ArrowDown":
+          this.dispatchEvent({ type: "down" });
+          break;
+        case "ArrowLeft":
+          this.dispatchEvent({ type: "left" });
+          break;
+        case "ArrowRight":
+          this.dispatchEvent({ type: "right" });
           break;
       }
     });
