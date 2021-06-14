@@ -3,7 +3,6 @@ import * as webpackDevServer from "webpack-dev-server";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import path from "path";
-import project from "../package.json";
 import { fonts } from "../shared/fonts";
 
 const projectRootPath = path.resolve(__dirname, "..");

@@ -23,6 +23,7 @@ specifiers:
   webpack: ^5.38.1
   webpack-cli: ^4.7.2
   webpack-dev-server: ^3.11.2
+  webpack-merge: ^5.8.0
 
 dependencies:
   '@fontsource/inter': 4.4.5
@@ -49,6 +50,7 @@ devDependencies:
   webpack: 5.38.1_webpack-cli@4.7.2
   webpack-cli: 4.7.2_4f38b4f344caeae135cc7debc9aac51b
   webpack-dev-server: 3.11.2_webpack-cli@4.7.2+webpack@5.38.1
+  webpack-merge: 5.8.0
 
 packages:
 

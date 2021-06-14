@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development TS_NODE_PROJECT=webpack/tsconfig.json webpack serve --config webpack/webpack.ts",
+    "build": "cross-env NODE_ENV=production TS_NODE_PROJECT=webpack/tsconfig.json webpack --config webpack/webpack.prod.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -34,6 +35,7 @@
     "typescript": "^4.3.2",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.8.0"
   }
 }
