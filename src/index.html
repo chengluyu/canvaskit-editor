@@ -6,50 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Text Editor with CanvasKit</title>
   </head>
-  <body>
-    <h1>Text Editor with CanvasKit</h1>
-    <div>
-      <a href="https://github.com/chengluyu/canvaskit-editor" target="_blank">
-        GitHub
-      </a>
-    </div>
-    <p>
-      Note: It takes time to show because this page loads
-      <ul>
-        <li>CanvasKit (6.61 MiB),</li>
-        <li>Noto Sans SC (1.53 MiB),</li>
-        <li>Noto Sans JP (1.8 MiB), and</li>
-        <li>Noto Color Emoji (9.94 MiB).</li>
-      </ul>
-    </p>
-    <div class="canvaskit-editor">
-      <canvas id="editor" tabindex="0"></canvas>
-    </div>
-    <div>
-      <input id="show-glyph-borders" type="checkbox" />
-      <label for="show-glyph-borders">Show glyph borders</label>
-    </div>
-    <div>
-      <input id="show-cursor-position" type="checkbox" />
-      <label for="show-cursor-position">Show cursor position</label>
-    </div>
-    <hr />
-    <p>Supported features:</p>
-    <ul>
-      <li>Display the caret. Note: the caret does not blink for now.</li>
-      <li>
-        Accept inputs from keys and input methods. Note: composition text does
-        not show for now.
-      </li>
-      <li>Select a range of text by mouse.</li>
-      <li>
-        Delete characters with <kbd>Delete</kbd> and <kbd>Backspace</kbd>.
-      </li>
-      <li>
-        Delete selected text with <kbd>Delete</kbd> and <kbd>Backspace</kbd>.
-      </li>
-      <li>Move the caret with arrow keys.</li>
-      <li>Double click to select words.</li>
-    </ul>
+  <body class="p-4 space-y-4">
+    <header class="prose">
+      <h1>Text Editor with <a href="https://www.npmjs.com/package/canvaskit-wasm" target="_blank" rel="noopener noreferrer">CanvasKit</a></h1>
+    </header>
+    <section class="p-4 bg-gray-100">
+      <div class="canvaskit-editor">
+        <canvas id="editor" tabindex="0"></canvas>
+      </div>
+    </section>
+    <section class="p-4 bg-gray-100">
+      <header class="prose"><h2>Options</h2></header>
+      <main>
+        <div>
+          <input id="show-glyph-borders" type="checkbox" />
+          <label for="show-glyph-borders">Show glyph borders</label>
+        </div>
+        <div>
+          <input id="show-cursor-position" type="checkbox" />
+          <label for="show-cursor-position">Show cursor position</label>
+        </div>
+      </main>
+    </section>
+    <section class="grid grid-cols-2 gap-4">
+      <article class="p-4 bg-gray-100 prose">
+        <h2>Features</h2>
+        <ul>
+          <li>Display the caret. Note: the caret does not blink for now.</li>
+          <li>
+            Accept inputs from keys and input methods. Note: composition text does
+            not show for now.
+          </li>
+          <li>Select a range of text by mouse.</li>
+          <li>
+            Delete characters with <kbd>Delete</kbd> and <kbd>Backspace</kbd>.
+          </li>
+          <li>
+            Delete selected text with <kbd>Delete</kbd> and <kbd>Backspace</kbd>.
+          </li>
+          <li>Move the caret with arrow keys.</li>
+          <li>Double click to select words.</li>
+        </ul>
+      </article>
+      <article class="p-4 bg-gray-100 prose">
+        <h2>Notes</h2>
+        <p>
+          The source code is available on
+          <a href="https://github.com/chengluyu/canvaskit-editor" target="_blank">GitHub</a>.
+          It takes time to show because this page loads following assets:
+          <ul>
+            <li><a href="https://www.npmjs.com/package/canvaskit-wasm" target="_blank" rel="noopener noreferrer">CanvasKit</a> (6.61 MiB),</li>
+            <li><a href="https://fontsource.org/fonts/noto-sans-sc" target="_blank" rel="noopener noreferrer">Noto Sans SC</a> (1.53 MiB),</li>
+            <li><a href="https://fontsource.org/fonts/noto-sans-jp" target="_blank" rel="noopener noreferrer">Noto Sans JP</a> (1.8 MiB), and</li>
+            <li><a href="https://github.com/googlefonts/noto-emoji" target="_blank" rel="noopener noreferrer">Noto Color Emoji</a> (9.94 MiB).</li>
+          </ul>
+        </p>
+      </article>
+    </section>
   </body>
 </html>
