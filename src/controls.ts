@@ -1,19 +1,16 @@
-const showGlyphBordersCheckbox = document.getElementById(
-  "show-glyph-borders"
-) as HTMLInputElement;
+import { createStore, WritableStore } from "nanostores";
 
-showGlyphBordersCheckbox.addEventListener("change", () => {
-  showGlyphBorders = showGlyphBordersCheckbox.checked;
-});
+export let showGlyphBorders = createCheckboxStore("show-glyph-borders");
 
-export let showGlyphBorders = showGlyphBordersCheckbox.checked;
+export let showCursorPosition = createCheckboxStore("show-cursor-position");
 
-const showCursorPositionCheckbox = document.getElementById(
-  "show-cursor-position"
-) as HTMLInputElement;
+function createCheckboxStore(selector: string): WritableStore<boolean> {
+  const element = document.getElementById(selector) as HTMLInputElement;
+  element.addEventListener("change", update);
+  const store = createStore<boolean>(update);
+  return store;
 
-showCursorPositionCheckbox.addEventListener("change", () => {
-  showCursorPosition = showCursorPositionCheckbox.checked;
-});
-
-export let showCursorPosition = showCursorPositionCheckbox.checked;
+  function update(): void {
+    store.set(element.checked);
+  }
+}

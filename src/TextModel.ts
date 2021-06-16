@@ -2,29 +2,17 @@ import clamp from "lodash/clamp";
 
 export default class TextModel {
   private _text: string;
-  private _onChanges: (() => void)[] = [];
 
   private _clampByRange(position: number): number {
     return clamp(position, 0, this._text.length);
   }
 
-  private _setText(newText: string): void {
-    this._text = newText;
-    for (const onChange of this._onChanges) {
-      onChange();
-    }
-  }
-
-  public constructor(initialText: string) {
-    this._text = initialText;
+  public constructor(text: string) {
+    this._text = text;
   }
 
   public get text(): string {
     return this._text;
-  }
-
-  public set text(newText: string) {
-    this._setText(newText);
   }
 
   public getWordIncludingPosition(position: number): [number, number] | null {
@@ -64,38 +52,43 @@ export default class TextModel {
       : [last + 1, first];
   }
 
-  public deleteBackward(position: number): number {
+  public deleteBackward(
+    position: number
+  ): [model: TextModel, position: number] {
     position = this._clampByRange(position);
-    this.strip(position - 1, position);
-    return this._clampByRange(position - 1);
+    return this.strip(position - 1, position);
   }
 
-  public deleteForward(position: number): number {
+  public deleteForward(position: number): [model: TextModel, position: number] {
     position = this._clampByRange(position);
-    this.strip(position, position + 1);
-    return position;
+    return this.strip(position, position + 1);
   }
 
-  public strip(begin: number, end: number): number {
+  public strip(
+    begin: number,
+    end: number
+  ): [model: TextModel, position: number] {
     [begin, end] = sortedCouple(
       this._clampByRange(begin),
       this._clampByRange(end)
     );
-    this._setText(this._text.slice(0, begin) + this._text.slice(end));
-    return begin;
+    return [
+      new TextModel(this._text.slice(0, begin) + this._text.slice(end)),
+      begin,
+    ];
   }
 
-  public insert(position: number, text: string): number {
+  public insert(
+    position: number,
+    text: string
+  ): [model: TextModel, position: number] {
     position = this._clampByRange(position);
-    this._setText(
-      this._text.slice(0, position) + text + this._text.slice(position)
-    );
-    console.log("Insert", text, position, text.length, position + text.length);
-    return position + text.length;
-  }
-
-  public onChange(callback: () => void): void {
-    this._onChanges.push(callback);
+    return [
+      new TextModel(
+        this._text.slice(0, position) + text + this._text.slice(position)
+      ),
+      position + text.length,
+    ];
   }
 
   public clampPosition(position: number): number {

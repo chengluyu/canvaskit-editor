@@ -18,7 +18,7 @@ specifiers:
   css-loader: ^5.2.6
   html-webpack-plugin: ^5.3.1
   lodash: ^4.17.21
-  normalize.css: ^8.0.1
+  nanostores: ^0.3.3
   postcss: ^8.3.4
   postcss-loader: ^6.1.0
   style-loader: ^2.0.0
@@ -38,7 +38,7 @@ dependencies:
   '@fontsource/noto-sans-sc': 4.4.5
   canvaskit-wasm: 0.27.0
   lodash: 4.17.21
-  normalize.css: 8.0.1
+  nanostores: 0.3.3
 
 devDependencies:
   '@tailwindcss/typography': 0.4.1_tailwindcss@2.1.4
@@ -2792,6 +2792,25 @@ packages:
       to-regex: 3.0.2
     dev: true
 
+  /nanostores/0.3.3:
+    resolution: {integrity: sha512-+MemxV/HzzTPJQCvzEmwfIFMAIcDEiod37A5F1ERyKQqtm6hbEfuNokfmJfecYM2gjunlPdPHA5lQ9cwHHSYNg==}
+    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
+    peerDependencies:
+      preact: '>=10.0.0'
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+      vue: '>=3.1.1'
+    peerDependenciesMeta:
+      preact:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      vue:
+        optional: true
+    dev: false
+
   /negotiator/0.6.2:
     resolution: {integrity: sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==}
     engines: {node: '>= 0.6'}
@@ -2843,10 +2862,6 @@ packages:
     resolution: {integrity: sha1-LRDAa9/TEuqXd2laTShDlFa3WUI=}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /normalize.css/8.0.1:
-    resolution: {integrity: sha512-qizSNPO93t1YUuUhP22btGOo3chcvDFqFaj2TRybP0DMxkHOCTYwp3n34fel4a31ORXy4m1Xq0Gyqpb5m33qIg==}
-    dev: false
 
   /npm-run-path/2.0.2:
     resolution: {integrity: sha1-NakjLfo11wZ7TLLd8jV7GHFTbF8=}

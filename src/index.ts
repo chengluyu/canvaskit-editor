@@ -1,7 +1,7 @@
-import "normalize.css";
+import "./index.css";
 import { CanvasKitInit } from "./canvaskit";
 import { preloadFonts } from "./fonts";
-import { render } from "./render";
+import { ignite } from "./dataflow";
 
 preloadFonts();
-CanvasKitInit().then(render);
+CanvasKitInit().then(ignite);
