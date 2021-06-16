@@ -25,7 +25,6 @@ canvas#editor {
   top: 0;
   left: 0;
   box-sizing: border-box;
-  cursor: text;
 }
 
 textarea.phantom {
