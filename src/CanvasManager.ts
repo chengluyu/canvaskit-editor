@@ -58,6 +58,10 @@ export default class CanvasManager {
     return this._size[1];
   }
 
+  public get kit(): CanvasKit {
+    return this._kit;
+  }
+
   public addEventListener<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: (this: HTMLCanvasElement, ev: HTMLElementEventMap[K]) => any,

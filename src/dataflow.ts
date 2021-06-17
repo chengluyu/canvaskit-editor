@@ -15,6 +15,7 @@ import {
   renderFrame,
 } from "./renderers";
 import TextModel from "./TextModel";
+import clamp from "lodash/clamp";
 
 export async function ignite(kit: CanvasKit) {
   const canvasManager = new CanvasManager(kit, "canvas");
@@ -71,6 +72,12 @@ export async function ignite(kit: CanvasKit) {
     paragraph.getShapedLines()
   );
 
+  const scrollBaseY = createStore<number>(() => {
+    scrollBaseY.set(0);
+  });
+
+  const mouseOffsetY = createDerived(scrollBaseY, (x) => -x);
+
   // Event actions
   const performMoveLeft = performMoveBetweenColumns.bind(null, -1);
   const performMoveRight = performMoveBetweenColumns.bind(null, 1);
@@ -85,8 +92,8 @@ export async function ignite(kit: CanvasKit) {
   });
 
   canvasManager.addEventListener("mouseenter", (e) => {
-    lastMousePosition = [e.offsetX, e.offsetY];
-    mousePositionStore.set([e.offsetX, e.offsetY]);
+    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
+    mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
   });
 
   canvasManager.addEventListener("mouseleave", () => {
@@ -96,16 +103,16 @@ export async function ignite(kit: CanvasKit) {
   });
 
   canvasManager.addEventListener("mousemove", (e) => {
-    lastMousePosition = [e.offsetX, e.offsetY];
-    mousePositionStore.set([e.offsetX, e.offsetY]);
+    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
+    mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
     if (isMouseDown) {
       extendSelection(...lastMousePosition);
     }
   });
 
   canvasManager.addEventListener("mousedown", (e) => {
-    lastMousePosition = [e.offsetX, e.offsetY];
-    mousePositionStore.set([e.offsetX, e.offsetY]);
+    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
+    mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
     isMouseDown = true;
     resetSelection(...lastMousePosition);
   });
@@ -113,8 +120,8 @@ export async function ignite(kit: CanvasKit) {
   canvasManager.addEventListener("dblclick", (e) => {
     const model = modelStore.value;
     if (model && paragraphStore.value) {
-      lastMousePosition = [e.offsetX, e.offsetY];
-      mousePositionStore.set([e.offsetX, e.offsetY]);
+      lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
+      mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
       const { pos } = paragraphStore.value.getGlyphPositionAtCoordinate(
         ...lastMousePosition
       );
@@ -123,8 +130,21 @@ export async function ignite(kit: CanvasKit) {
   });
 
   canvasManager.addEventListener("mouseup", (e) => {
-    lastMousePosition = [e.offsetX, e.offsetY];
+    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
     isMouseDown = false;
+  });
+
+  canvasManager.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const paragraphHeight = getValue(paragraphStore).getHeight();
+    const canvasHeight = canvasManager.height;
+    scrollBaseY.set(
+      clamp(
+        getValue(scrollBaseY) + e.deltaY,
+        Math.min(canvasHeight - paragraphHeight, 0),
+        0
+      )
+    );
   });
 
   canvasManager.addEventListener("keydown", (e) => {
@@ -358,21 +378,22 @@ export async function ignite(kit: CanvasKit) {
   );
 
   const frameDataStore = createDerived(
-    [selectionRegionsStore, paragraphStore, debugLayerDataStore],
+    [selectionRegionsStore, paragraphStore, scrollBaseY, debugLayerDataStore],
     (
       selectionRegions,
       paragraph,
+      offsetY,
       debugLayerData
     ): (FrameData & DebugLayerData) | null =>
       paragraph === null
         ? null
-        : { selectionRegions, paragraph, ...debugLayerData }
+        : { selectionRegions, paragraph, offsetY, ...debugLayerData }
   );
 
-  frameDataStore.listen((data) => {
+  frameDataStore.subscribe((data) => {
     if (data !== null) {
       canvasManager.requestAnimationFrame((canvas) => {
-        renderFrame(kit, canvas, data, paints);
+        renderFrame(canvasManager, canvas, data, paints);
         renderDebugLayer(canvasManager, canvas, data, paints);
       });
     }

@@ -7,27 +7,54 @@ import { SelectionRegions } from "./dataflow";
 export type FrameData = {
   paragraph: Paragraph;
   selectionRegions: SelectionRegions | null;
+  offsetY: number;
 };
 
 export function renderFrame(
-  kit: CanvasKit,
+  manager: CanvasManager,
   canvas: Canvas,
   data: FrameData,
   paints: Record<string, Paint>
 ): void {
-  canvas.clear(kit.WHITE);
+  canvas.clear(manager.kit.WHITE);
   // Draw selected texts.
   if (data.selectionRegions?.regions) {
     for (const rect of data.selectionRegions.regions) {
-      canvas.drawRect(rect, paints.selection);
+      const [x0, y0, x1, y1] = rect;
+      canvas.drawRect(
+        [x0, y0 + data.offsetY, x1, y1 + data.offsetY],
+        paints.selection
+      );
     }
   }
   // Draw the paragraph.
-  canvas.drawParagraph(data.paragraph, 0, 0);
+  canvas.drawParagraph(data.paragraph, 0, data.offsetY);
   // Draw the caret.
   if (data.selectionRegions?.caret) {
     const [x, top, bottom] = data.selectionRegions.caret;
-    canvas.drawLine(x, top, x, bottom, paints.caret);
+    canvas.drawLine(
+      x,
+      data.offsetY + top,
+      x,
+      data.offsetY + bottom,
+      paints.caret
+    );
+  }
+  const canvasHeight = manager.height;
+  const paragraphHeight = data.paragraph.getHeight();
+  if (paragraphHeight > canvasHeight) {
+    const scrollBarBaseY = canvasHeight * (-data.offsetY / paragraphHeight);
+    const scrollBarWidth = 8;
+    const scrollBarHeight = canvasHeight * (canvasHeight / paragraphHeight);
+    canvas.drawRect(
+      [
+        manager.width - scrollBarWidth,
+        scrollBarBaseY,
+        manager.width,
+        scrollBarBaseY + scrollBarHeight,
+      ],
+      paints.scrollBar
+    );
   }
 }
 
