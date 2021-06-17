@@ -1,5 +1,5 @@
 import { CanvasKit } from "canvaskit-wasm";
-import { createDerived, createStore } from "nanostores";
+import { createDerived, createStore, getValue } from "nanostores";
 import { fontFamilies } from "../shared/fonts";
 import { Paragraph } from "./canvaskit";
 import CanvasManager from "./CanvasManager";
@@ -18,16 +18,24 @@ import TextModel from "./TextModel";
 
 export async function ignite(kit: CanvasKit) {
   const canvasManager = new CanvasManager(kit, "canvas");
-  const fontSize = 24;
   const fontMgr = await loadFonts(kit);
-  const paragraphStyle = new kit.ParagraphStyle({
-    textStyle: {
-      color: kit.BLACK,
-      fontFamilies,
-      fontSize,
-    },
-    textAlign: kit.TextAlign.Left,
+
+  const widthStore = createStore<number>(() => {
+    widthStore.set(canvasManager.width);
   });
+
+  const paragraphStyleStore = createDerived(
+    controls.fontSize,
+    (fontSize) =>
+      new kit.ParagraphStyle({
+        textStyle: {
+          color: kit.BLACK,
+          fontFamilies,
+          fontSize,
+        },
+        textAlign: kit.TextAlign.Left,
+      })
+  );
 
   const modelStore = createStore<TextModel>(() => {
     modelStore.set(new TextModel(sampleText));
@@ -48,13 +56,16 @@ export async function ignite(kit: CanvasKit) {
     }
   });
 
-  const paragraphStore = createDerived(modelStore, (model): Paragraph => {
-    const builder = kit.ParagraphBuilder.Make(paragraphStyle, fontMgr);
-    builder.addText(model.text);
-    const paragraph = builder.build();
-    paragraph.layout(canvasManager.width);
-    return paragraph;
-  });
+  const paragraphStore = createDerived(
+    [modelStore, controls.width, paragraphStyleStore],
+    (model, width, paragraphStyle): Paragraph => {
+      const builder = kit.ParagraphBuilder.Make(paragraphStyle, fontMgr);
+      builder.addText(model.text);
+      const paragraph = builder.build();
+      paragraph.layout(width);
+      return paragraph;
+    }
+  );
 
   const shapedLinesStore = createDerived(paragraphStore, (paragraph) =>
     paragraph.getShapedLines()
@@ -306,6 +317,7 @@ export async function ignite(kit: CanvasKit) {
 
   function performMoveBetweenRows(upward: boolean): void {
     const selectionRegions = selectionRegionsStore.value;
+    const fontSize = getValue(controls.fontSize);
     if (
       selectionRegions === null ||
       selectionRegions === undefined ||
