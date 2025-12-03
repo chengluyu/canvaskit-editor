@@ -1,4 +1,4 @@
-import { createStore, WritableStore } from "nanostores";
+import { atom, type WritableAtom } from "nanostores";
 import clamp from "lodash/clamp";
 
 export let showGlyphBorders = createCheckboxStore("show-glyph-borders");
@@ -16,29 +16,27 @@ showCursorPosition.subscribe((showCursor) => {
   }
 });
 
-function createCheckboxStore(selector: string): WritableStore<boolean> {
+function createCheckboxStore(selector: string): WritableAtom<boolean> {
   const element = document.getElementById(selector) as HTMLInputElement;
-  element.addEventListener("change", update);
-  const store = createStore<boolean>(update);
-  return store;
-
-  function update(): void {
+  const store = atom<boolean>(element.checked);
+  element.addEventListener("change", () => {
     store.set(element.checked);
-  }
+  });
+  return store;
 }
 
 function createNumericInputStore(
   selector: string,
   range: [number, number]
-): WritableStore<number> {
+): WritableAtom<number> {
   const element = document.querySelector(selector) as HTMLInputElement;
-  element.addEventListener("change", update);
-  const store = createStore<number>(update);
-  return store;
-
-  function update(): void {
+  const initialValue = clamp(parseInt(element.value, 10), ...range);
+  const store = atom<number>(initialValue);
+  element.value = initialValue.toString();
+  element.addEventListener("change", () => {
     const value = clamp(parseInt(element.value, 10), ...range);
     store.set(value);
     element.value = value.toString();
-  }
+  });
+  return store;
 }

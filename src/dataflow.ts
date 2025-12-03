@@ -1,5 +1,5 @@
 import { CanvasKit } from "canvaskit-wasm";
-import { createDerived, createStore, getValue } from "nanostores";
+import { atom, computed } from "nanostores";
 import { fontFamilies } from "../shared/fonts";
 import { Paragraph } from "./canvaskit";
 import CanvasManager from "./CanvasManager";
@@ -21,11 +21,7 @@ export async function ignite(kit: CanvasKit) {
   const canvasManager = new CanvasManager(kit, "canvas");
   const fontMgr = await loadFonts(kit);
 
-  const widthStore = createStore<number>(() => {
-    widthStore.set(canvasManager.width);
-  });
-
-  const paragraphStyleStore = createDerived(
+  const paragraphStyleStore = computed(
     controls.fontSize,
     (fontSize) =>
       new kit.ParagraphStyle({
@@ -38,16 +34,12 @@ export async function ignite(kit: CanvasKit) {
       })
   );
 
-  const modelStore = createStore<TextModel>(() => {
-    modelStore.set(new TextModel(sampleText));
-  });
+  const modelStore = atom<TextModel>(new TextModel(sampleText));
 
-  const selectionStore = createStore<[number, number] | number | null>(() => {
-    selectionStore.set([2, 100]);
-  });
+  const selectionStore = atom<[number, number] | number | null>([2, 100]);
 
   modelStore.subscribe((model) => {
-    const selection = selectionStore.value;
+    const selection = selectionStore.get();
     if (selection === null || selection === undefined) {
       selectionStore.set(null);
     } else if (typeof selection === "number") {
@@ -57,7 +49,7 @@ export async function ignite(kit: CanvasKit) {
     }
   });
 
-  const paragraphStore = createDerived(
+  const paragraphStore = computed(
     [modelStore, controls.width, paragraphStyleStore],
     (model, width, paragraphStyle): Paragraph => {
       const builder = kit.ParagraphBuilder.Make(paragraphStyle, fontMgr);
@@ -68,15 +60,13 @@ export async function ignite(kit: CanvasKit) {
     }
   );
 
-  const shapedLinesStore = createDerived(paragraphStore, (paragraph) =>
+  const shapedLinesStore = computed(paragraphStore, (paragraph) =>
     paragraph.getShapedLines()
   );
 
-  const scrollBaseY = createStore<number>(() => {
-    scrollBaseY.set(0);
-  });
+  const scrollBaseY = atom<number>(0);
 
-  const mouseOffsetY = createDerived(scrollBaseY, (x) => -x);
+  const mouseOffsetY = computed(scrollBaseY, (x) => -x);
 
   // Event actions
   const performMoveLeft = performMoveBetweenColumns.bind(null, -1);
@@ -87,13 +77,11 @@ export async function ignite(kit: CanvasKit) {
   let isMouseDown = false;
   let lastMousePosition: [number, number] | null = null;
 
-  const mousePositionStore = createStore<[x: number, y: number] | null>(() => {
-    mousePositionStore.set(null);
-  });
+  const mousePositionStore = atom<[x: number, y: number] | null>(null);
 
   canvasManager.addEventListener("mouseenter", (e) => {
-    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
-    mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
+    lastMousePosition = [e.offsetX, mouseOffsetY.get() + e.offsetY];
+    mousePositionStore.set([e.offsetX, mouseOffsetY.get() + e.offsetY]);
   });
 
   canvasManager.addEventListener("mouseleave", () => {
@@ -103,16 +91,16 @@ export async function ignite(kit: CanvasKit) {
   });
 
   canvasManager.addEventListener("mousemove", (e) => {
-    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
-    mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
+    lastMousePosition = [e.offsetX, mouseOffsetY.get() + e.offsetY];
+    mousePositionStore.set([e.offsetX, mouseOffsetY.get() + e.offsetY]);
     if (isMouseDown) {
       extendSelection(...lastMousePosition);
     }
   });
 
   canvasManager.addEventListener("mousedown", (e) => {
-    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
-    mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
+    lastMousePosition = [e.offsetX, mouseOffsetY.get() + e.offsetY];
+    mousePositionStore.set([e.offsetX, mouseOffsetY.get() + e.offsetY]);
     isMouseDown = true;
     resetSelection(...lastMousePosition);
   });
@@ -120,8 +108,8 @@ export async function ignite(kit: CanvasKit) {
   canvasManager.addEventListener("dblclick", (e) => {
     const model = modelStore.value;
     if (model && paragraphStore.value) {
-      lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
-      mousePositionStore.set([e.offsetX, getValue(mouseOffsetY) + e.offsetY]);
+      lastMousePosition = [e.offsetX, mouseOffsetY.get() + e.offsetY];
+      mousePositionStore.set([e.offsetX, mouseOffsetY.get() + e.offsetY]);
       const { pos } = paragraphStore.value.getGlyphPositionAtCoordinate(
         ...lastMousePosition
       );
@@ -130,17 +118,18 @@ export async function ignite(kit: CanvasKit) {
   });
 
   canvasManager.addEventListener("mouseup", (e) => {
-    lastMousePosition = [e.offsetX, getValue(mouseOffsetY) + e.offsetY];
+    lastMousePosition = [e.offsetX, mouseOffsetY.get() + e.offsetY];
     isMouseDown = false;
   });
 
   canvasManager.addEventListener("wheel", (e) => {
     e.preventDefault();
-    const paragraphHeight = getValue(paragraphStore).getHeight();
+    const paragraph = paragraphStore.get();
+    const paragraphHeight = paragraph.getHeight();
     const canvasHeight = canvasManager.height;
     scrollBaseY.set(
       clamp(
-        getValue(scrollBaseY) + e.deltaY,
+        scrollBaseY.get() + e.deltaY,
         Math.min(canvasHeight - paragraphHeight, 0),
         0
       )
@@ -170,7 +159,7 @@ export async function ignite(kit: CanvasKit) {
     }
   });
 
-  const selectionRegionsStore = createDerived(
+  const selectionRegionsStore = computed(
     [modelStore, selectionStore, paragraphStore],
     (model, selection, paragraph): SelectionRegions | null => {
       if (selection === null) {
@@ -337,7 +326,7 @@ export async function ignite(kit: CanvasKit) {
 
   function performMoveBetweenRows(upward: boolean): void {
     const selectionRegions = selectionRegionsStore.value;
-    const fontSize = getValue(controls.fontSize);
+    const fontSize = controls.fontSize.get();
     if (
       selectionRegions === null ||
       selectionRegions === undefined ||
@@ -359,7 +348,7 @@ export async function ignite(kit: CanvasKit) {
 
   const paints = getDefaultPaints(kit);
 
-  const debugLayerDataStore = createDerived(
+  const debugLayerDataStore = computed(
     [
       controls.showCursorPosition,
       controls.showGlyphBorders,
@@ -377,7 +366,7 @@ export async function ignite(kit: CanvasKit) {
     })
   );
 
-  const frameDataStore = createDerived(
+  const frameDataStore = computed(
     [selectionRegionsStore, paragraphStore, scrollBaseY, debugLayerDataStore],
     (
       selectionRegions,
