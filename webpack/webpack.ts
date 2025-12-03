@@ -1,5 +1,5 @@
 import * as webpack from "webpack";
-import * as webpackDevServer from "webpack-dev-server";
+import type { Configuration as DevServerConfiguration } from "webpack-dev-server";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import path from "path";
@@ -11,16 +11,17 @@ const src = path.join.bind(null, root("src"));
 const dist = path.join.bind(null, root("dist"));
 
 const config: webpack.Configuration & {
-  devServer?: webpackDevServer.Configuration;
+  devServer?: DevServerConfiguration;
 } = {
   mode: "development",
   entry: {
     main: src("index.ts"),
   },
   devServer: {
-    contentBase: dist(),
+    static: {
+      directory: dist(),
+    },
     hot: true,
-    transportMode: "ws",
   },
   devtool: "inline-source-map",
   output: {

@@ -1,13 +1,6 @@
-import * as all from "canvaskit-wasm";
-import { CanvasKit } from "canvaskit-wasm";
+import initCanvasKit, { CanvasKit } from "canvaskit-wasm";
 export * from "canvaskit-wasm";
 
-type CorrectModule = {
-  default: typeof all.CanvasKitInit;
-};
-
-const initialize = (all as unknown as CorrectModule).default;
-
 export function CanvasKitInit(): Promise<CanvasKit> {
-  return initialize({ locateFile: () => "canvaskit.wasm" });
+  return initCanvasKit({ locateFile: () => "canvaskit.wasm" });
 }

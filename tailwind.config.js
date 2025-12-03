@@ -1,12 +1,4 @@
 module.exports = {
-  mode: "jit",
-  purge: ["src/**/*.html"],
-  darkMode: false, // or 'media' or 'class'
-  theme: {
-    extend: {},
-  },
-  variants: {
-    extend: {},
-  },
+  content: ["./src/**/*.{html,ts,tsx}", "./shared/**/*.{ts,tsx}"],
   plugins: [require("@tailwindcss/typography")],
 };
